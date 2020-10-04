@@ -1,6 +1,5 @@
 package de.team33.libs.classes.v1;
 
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 
@@ -8,9 +7,6 @@ import java.util.stream.Stream;
  * Utility for dealing with classes.
  */
 public class Classes {
-
-    private static final Function<Class<?>, Stream<Class<?>>> DEEP = Classes::superClass;
-    private static final Function<Class<?>, Stream<Class<?>>> WIDE = Classes::superClasses;
 
     /**
      * Determines the distance of a given class {@code <subject>} from one of its superclasses or interfaces
@@ -20,15 +16,7 @@ public class Classes {
      * @throws NullPointerException     if one of the given Arguments is {@code null}.
      */
     public static int distance(final Class<?> subject, final Class<?> superClass) {
-        return new Distance(superClass, superClass.isInterface() ? WIDE : DEEP).from(subject);
-    }
-
-    private static Stream<Class<?>> superClass(final Class<?> subClass) {
-        return streamOf(subClass.getSuperclass());
-    }
-
-    private static Stream<Class<?>> superClasses(final Class<?> subClass) {
-        return Stream.concat(Stream.of(subClass.getInterfaces()), superClass(subClass));
+        return Distance.of(superClass).from(subject);
     }
 
     /**
@@ -48,8 +36,9 @@ public class Classes {
      * @see #wideStreamOf(Class)
      */
     public static Stream<Class<?>> deepStreamOf(final Class<?> subject) {
-        return (null == subject) ? Stream.empty() :
-                Stream.concat(deepStreamOf(subject.getSuperclass()), Stream.of(subject));
+        return (null == subject)
+                ? Stream.empty()
+                : Stream.concat(deepStreamOf(subject.getSuperclass()), Stream.of(subject));
     }
 
     /**
@@ -64,8 +53,9 @@ public class Classes {
     }
 
     private static Stream<Class<?>> broad(final Class<?> subject) {
-        return (null == subject) ? Stream.empty() :
-                broad(subject.getInterfaces(), subject.getSuperclass(), subject);
+        return (null == subject)
+                ? Stream.empty()
+                : broad(subject.getInterfaces(), subject.getSuperclass(), subject);
     }
 
     private static Stream<Class<?>> broad(final Class<?>[] interfaces,
