@@ -33,7 +33,7 @@ class Distance {
 
     private int from(final Stream<Class<?>> subClasses) throws InternalException {
         return subClasses
-                .filter(superClass::isAssignableFrom)
+                .filter(sub -> Classes.isHierarchical(superClass, sub))
                 .map(this::from)
                 .reduce(Math::min)
                 .orElseThrow(InternalException::new);

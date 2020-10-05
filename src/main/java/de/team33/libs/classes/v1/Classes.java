@@ -1,5 +1,6 @@
 package de.team33.libs.classes.v1;
 
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 
@@ -66,5 +67,86 @@ public class Classes {
 
     private static Stream<Class<?>> broad(final Class<?>[] subjects) {
         return Stream.of(subjects).map(Classes::broad).reduce(Stream::concat).orElseGet(Stream::empty);
+    }
+
+    private static boolean isHierarchical(final Class<?> superClass, final Stream<Class<?>> subClasses) {
+        return subClasses.anyMatch(subClass -> isHierarchical(superClass, subClass));
+    }
+
+    public static boolean isHierarchical(final Class<?> superClass, final Class<?> subClass) {
+        return superClass.equals(subClass) || isHierarchical(superClass, Stream.concat(
+                Stream.of(subClass.getInterfaces()),
+                streamOf(subClass.getSuperclass())
+        ));
+    }
+
+    public interface Streaming extends Function<Class<?>, Stream<Class<?>>> {
+
+        /**
+         * Streams a single {@link Class} that is probably {@code null}.
+         * The result is either an empty {@link Stream} or a {@link Stream} containing exactly one element.
+         */
+        Streaming OPTIONAL = subject -> (null == subject) ? Stream.empty() : Stream.of(subject);
+
+        /**
+         * Streams the direct {@link Class#getSuperclass() superclass} of a given {@link Class}.
+         * The result is either an empty {@link Stream} or a {@link Stream} containing exactly one element.
+         */
+        Streaming SUPER_CLASS = subject -> OPTIONAL.apply(subject.getSuperclass());
+
+        /**
+         * Streams the direct {@link Class#getInterfaces() interfaces} of a given {@link Class}.
+         */
+        Streaming INTERFACES = subject -> Stream.of(subject.getInterfaces());
+
+        /**
+         * Streams the direct {@link Class#getSuperclass() superclass} and the direct
+         * {@link Class#getInterfaces() interfaces} of a given {@link Class}.
+         */
+        Streaming SUPERIORS = subject -> Stream.concat(INTERFACES.apply(subject), SUPER_CLASS.apply(subject));
+
+    }
+
+    private static class Distance {
+
+        private static final int LIMIT = Short.MAX_VALUE;
+
+        private final Class<?> superClass;
+        private final Function<Class<?>, Stream<Class<?>>> superClasses;
+
+        private Distance(final Class<?> superClass, final Function<Class<?>, Stream<Class<?>>> superClasses) {
+            this.superClass = superClass;
+            this.superClasses = superClasses;
+        }
+
+        static Distance of(final Class<?> superClass) {
+            if (superClass.isInterface())
+                return new Distance(superClass, Distance::superClassesOf);
+            else
+                return new Distance(superClass, Distance::superClassOf);
+        }
+
+        private static <E> Stream<E> streamOf(final E nullable) {
+            return (null == nullable) ? Stream.empty() : Stream.of(nullable);
+        }
+
+        private static Stream<Class<?>> superClassOf(final Class<?> aClass) {
+            return streamOf(aClass.getSuperclass());
+        }
+
+        private static Stream<Class<?>> superClassesOf(final Class<?> aClass) {
+            return Stream.concat(Stream.of(aClass.getInterfaces()), superClassOf(aClass));
+        }
+
+        final int from(final Class<?> subClass) {
+            return superClass.equals(subClass) ? 0 : 1 + from(superClasses.apply(subClass));
+        }
+
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
+        private int from(final Stream<Class<?>> subClasses) {
+            return subClasses.filter(subClass -> isHierarchical(superClass, subClass))
+                             .map(this::from)
+                             .reduce(LIMIT, Math::min);
+        }
     }
 }

@@ -3,11 +3,16 @@ package de.team33.test.classes.v1;
 import de.team33.libs.classes.v1.Classes;
 import org.junit.Test;
 
+import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.AbstractList;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,10 +20,37 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
 public class ClassesTest {
+
+    private static final List<Class<?>> CLASSES = Arrays.asList(
+            Object.class,
+            Integer.class,
+            BigInteger.class,
+            Number.class,
+            String.class,
+            StringBuilder.class,
+            CharSequence.class,
+            Collection.class,
+            List.class,
+            Set.class,
+            AbstractList.class,
+            ArrayList.class,
+            HashSet.class,
+            AbstractSet.class,
+            Serializable.class,
+            Cloneable.class,
+            Inner.class,
+            Super.class,
+            Base.class,
+            ISuper1.class,
+            ISuper2.class,
+            ISuper3.class
+    );
 
     @Test
     public void distance() {
@@ -104,6 +136,31 @@ public class ClassesTest {
                                    "class de.team33.test.classes.v1.ClassesTest$Super",
                                    "class de.team33.test.classes.v1.ClassesTest$Inner"),
                      Classes.wideStreamOf(Inner.class).map(Class::toString).collect(Collectors.toList()));
+    }
+
+    @Test
+    public void isHierarchical() {
+        for (Class<?> superClass : CLASSES) {
+            assertHierarchical(superClass);
+        }
+    }
+
+    private void assertHierarchical(final Class<?> superClass) {
+        for (Class<?> subClass : CLASSES) {
+            assertHierarchical(superClass, subClass);
+        }
+    }
+
+    private void assertHierarchical(final Class<?> superClass, final Class<?> subClass) {
+        final boolean assignable = superClass.isAssignableFrom(subClass);
+        final boolean hierarchical = Classes.isHierarchical(superClass, subClass);
+        final String message = superClass + " > " + subClass;
+        if (Object.class.equals(superClass) && subClass.isInterface()) {
+            assertTrue(message, assignable);
+            assertFalse(message, hierarchical);
+        } else {
+            assertEquals(message, assignable, hierarchical);
+        }
     }
 
     private interface ISuper1 {
