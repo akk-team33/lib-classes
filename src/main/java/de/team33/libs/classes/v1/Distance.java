@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 class Distance {
 
-    private static final Function<Class<?>, Stream<Class<?>>> STRAIGHT = sub -> Classes.streamOf(sub.getSuperclass());
+    private static final Function<Class<?>, Stream<Class<?>>> STRAIGHT = sub -> Classes.streamOptional(sub.getSuperclass());
     private static final Function<Class<?>, Stream<Class<?>>> WIDE = sub -> Stream.concat(Stream.of(sub.getInterfaces()), STRAIGHT.apply(sub));
 
     private final Class<?> superClass;
