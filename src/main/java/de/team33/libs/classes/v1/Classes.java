@@ -21,16 +21,21 @@ public class Classes {
     }
 
     /**
-     * Streams a given class that may be {@code null}.
-     * In that case, the resulting {@link Stream} is empty, otherwise it contains exactly the one given class.
+     * Treats a given {@link Class} as a {@link Stream}.
+     *
+     * @param subject The given {@link Class} or {@code null}.
+     *
+     * @return A {@link Stream} consisting on the given {@link Class} or an empty {@link Stream}.
      */
     public static Stream<Class<?>> streamOptional(final Class<?> subject) {
         return (null == subject) ? Stream.empty() : Stream.of(subject);
     }
 
     /**
-     * Streams the direct {@link Class#getSuperclass() superclass} of a given {@link Class}.
-     * The result is either an empty {@link Stream} or a {@link Stream} containing exactly one element.
+     * Treats the direct {@link Class#getSuperclass() superclass} of a given {@link Class} as a {@link Stream}.
+     *
+     * The result will be an empty {@link Stream} if the given {@link Class} has no {@link Class#getSuperclass()
+     * superclass}. Otherwise the result is a {@link Stream} consisting of exactly one element.
      */
     public static Stream<Class<?>> streamSuperClass(final Class<?> subject) {
         return streamOptional(subject.getSuperclass());
