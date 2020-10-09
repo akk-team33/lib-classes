@@ -14,12 +14,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -101,33 +97,6 @@ public class ClassesTest {
     @Test(expected = NullPointerException.class)
     public void distanceNullNull() {
         fail("Should fail but was " + Classes.distance(null, null));
-    }
-
-    @Test
-    public void empty() {
-        Stream.<Function<Class<?>, Stream<Class<?>>>>of(Classes::streamOptional,
-                                                        Classes::streamLinearDescent,
-                                                        Classes::wideStreamOf).forEach(toStream -> assertEquals(
-                emptyList(),
-                toStream.apply(null).map(Class::toString).collect(Collectors.toList())));
-    }
-
-    @Test
-    public void flat() {
-        assertEquals(singletonList("class de.team33.test.classes.v1.ClassesTest$Inner"),
-                     Classes.streamOptional(Inner.class).map(Class::toString).collect(Collectors.toList()));
-    }
-
-    @Test
-    public void deep() {
-        assertEquals(
-                Arrays.asList(
-                        "class java.lang.Object",
-                        "class de.team33.test.classes.v1.ClassesTest$Base",
-                        "class de.team33.test.classes.v1.ClassesTest$Super",
-                        "class de.team33.test.classes.v1.ClassesTest$Inner"
-                ),
-                Classes.streamLinearDescent(Inner.class).map(Class::toString).collect(Collectors.toList()));
     }
 
     @Test

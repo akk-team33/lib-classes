@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import static de.team33.libs.classes.v1.Classes.Streaming.LINEAGE_HIERARCHY;
 import static de.team33.libs.classes.v1.Classes.Streaming.INTERFACES;
 import static de.team33.libs.classes.v1.Classes.Streaming.LINEAR_DESCENT;
-import static de.team33.libs.classes.v1.Classes.Streaming.OPTIONAL;
 import static de.team33.libs.classes.v1.Classes.Streaming.SUPERIOR;
 import static de.team33.libs.classes.v1.Classes.Streaming.SUPER_CLASS;
 import static java.util.Arrays.asList;
@@ -48,15 +47,6 @@ public class ClassesStreamingTest {
             Cloneable.class
     );
     private static final Class<?> ABSTRACT_STRING_BUILDER_CLASS = StringBuilder.class.getSuperclass();
-
-    @Test
-    public void optional() {
-        CLASSES.forEach(subject -> assertEquals(singletonList(subject),
-                                                OPTIONAL.apply(subject)
-                                                        .collect(Collectors.toList())));
-        assertEquals(emptyList(), OPTIONAL.apply(null)
-                                          .collect(Collectors.toList()));
-    }
 
     @Test
     public void superClass() {

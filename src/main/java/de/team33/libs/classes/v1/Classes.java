@@ -7,7 +7,12 @@ import java.util.stream.Stream;
 /**
  * Utility for dealing with classes.
  */
+@SuppressWarnings("WeakerAccess")
 public class Classes {
+
+    private static <E> Stream<E> stream(final E subject) {
+        return (null == subject) ? Stream.empty() : Stream.of(subject);
+    }
 
     /**
      * Determines the distance of a given class {@code <subject>} from one of its superclasses or interfaces
@@ -21,39 +26,11 @@ public class Classes {
     }
 
     /**
-     * Treats a given {@link Class} as a {@link Stream}.
-     *
-     * @param subject The given {@link Class} or {@code null}.
-     *
-     * @return A {@link Stream} consisting on the given {@link Class} or an empty {@link Stream}.
-     */
-    public static Stream<Class<?>> streamOptional(final Class<?> subject) {
-        return (null == subject) ? Stream.empty() : Stream.of(subject);
-    }
-
-    /**
-     * Treats the direct {@link Class#getSuperclass() superclass} of a given {@link Class} as a {@link Stream}.
-     *
-     * The result will be an empty {@link Stream} if the given {@link Class} has no {@link Class#getSuperclass()
-     * superclass}. Otherwise the result is a {@link Stream} consisting of exactly one element.
-     */
-    public static Stream<Class<?>> streamSuperClass(final Class<?> subject) {
-        return streamOptional(subject.getSuperclass());
-    }
-
-    /**
-     * Streams the direct {@link Class#getInterfaces() interfaces} of a given {@link Class}.
-     */
-    public static Stream<Class<?>> streamInterfaces(final Class<?> subject) {
-        return Stream.of(subject.getInterfaces());
-    }
-
-    /**
      * Streams, in a single step, all the direct {@link Class#getInterfaces() interfaces} and, if any, the direct
      * {@link Class#getSuperclass() superclass} of a given {@link Class}.
      */
     public static Stream<Class<?>> streamSuperior(final Class<?> subject) {
-        return Stream.concat(streamInterfaces(subject), streamSuperClass(subject));
+        return Stream.concat(Stream.of(subject.getInterfaces()), stream(subject.getSuperclass()));
     }
 
     /**
@@ -85,17 +62,10 @@ public class Classes {
                              Stream.of(subject));
     }
 
-    private static Stream<Class<?>> streamBroadDescent(final Stream<Class<?>> subjects) {
-        return subjects.map(Classes::streamLineageHierarchy)
-                       .reduce(Stream::concat)
-                       .orElseGet(Stream::empty);
-    }
-
     /**
      * Streams a {@link Class} hierarchy. This method includes the given {@link Class}, its
      * {@linkplain Class#getSuperclass() superclasses} and its {@linkplain Class#getInterfaces() superinterfaces}.
      *
-     * @see #streamOptional(Class)
      * @see #streamLinearDescent(Class)
      */
     public static Stream<Class<?>> wideStreamOf(final Class<?> subject) {
@@ -125,37 +95,44 @@ public class Classes {
     public static boolean isHierarchical(final Class<?> superClass, final Class<?> subClass) {
         return superClass.equals(subClass) || isHierarchical(superClass, Stream.concat(
                 Stream.of(subClass.getInterfaces()),
-                streamOptional(subClass.getSuperclass())
+                stream(subClass.getSuperclass())
         ));
     }
 
     /**
-     * Provides streaming methods from {@link Classes} as {@link Function}s.
+     * Provides streaming methods from {@link Classes} as predefined {@link Function}s.
      */
     public interface Streaming extends Function<Class<?>, Stream<Class<?>>> {
 
         /**
-         * Encapsulates {@link #streamOptional(Class)} as {@link Function}
+         * For convenience: a {@link Function} to treat the direct {@link Class#getSuperclass() superclass} of a given
+         * {@link Class} as a {@link Stream}.
+         *
+         * The result will be an empty {@link Stream} if the given {@link Class} has no {@link Class#getSuperclass()
+         * superclass}. Otherwise the result is a {@link Stream} consisting of exactly one element, namely the
+         * requested {@link Class#getSuperclass() superclass}.
          */
-        Streaming OPTIONAL = Classes::streamOptional;
+        Streaming SUPER_CLASS = subject -> stream(subject.getSuperclass());
 
         /**
-         * Encapsulates {@link #streamSuperClass(Class)} as {@link Function}
+         * For convenience: a {@link Function} to treat the direct {@link Class#getInterfaces() interfaces} of a given
+         * {@link Class} as a {@link Stream}.
          */
-        Streaming SUPER_CLASS = Classes::streamSuperClass;
-
-        /**
-         * Encapsulates {@link #streamInterfaces(Class)} as a {@link Function}
-         */
-        Streaming INTERFACES = Classes::streamInterfaces;
+        Streaming INTERFACES = subject -> Stream.of(subject.getInterfaces());
 
         /**
          * Encapsulates {@link #streamSuperior(Class)} as a {@link Function}
          */
         Streaming SUPERIOR = Classes::streamSuperior;
 
+        /**
+         * Encapsulates {@link #streamLinearDescent(Class)} as a {@link Function}
+         */
         Streaming LINEAR_DESCENT = Classes::streamLinearDescent;
 
+        /**
+         * Encapsulates {@link #streamLineageHierarchy(Class)} as a {@link Function}
+         */
         Streaming LINEAGE_HIERARCHY = Classes::streamLineageHierarchy;
     }
 
