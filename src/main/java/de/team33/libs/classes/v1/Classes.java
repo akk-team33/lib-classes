@@ -36,7 +36,7 @@ public class Classes {
     /**
      * Streams the linear descent of a given {@link Class}, made up of the linear descent of its
      * {@link Class#getSuperclass() superclass}, and the {@link Class} itself.
-     *
+     * <p>
      * The Result will be an empty {@link Stream} if {@code subject} is {@code null}.
      */
     public static Stream<Class<?>> streamLinearDescent(final Class<?> subject) {
@@ -86,17 +86,8 @@ public class Classes {
 
     private static Stream<Class<?>> broad(final Class<?>[] subjects) {
         return Stream.of(subjects).map(Classes::broad).reduce(Stream::concat).orElseGet(Stream::empty);
-    }
-
-    private static boolean isHierarchical(final Class<?> superClass, final Stream<Class<?>> subClasses) {
-        return subClasses.anyMatch(subClass -> isHierarchical(superClass, subClass));
-    }
-
-    public static boolean isHierarchical(final Class<?> superClass, final Class<?> subClass) {
-        return superClass.equals(subClass) || isHierarchical(superClass, Stream.concat(
-                Stream.of(subClass.getInterfaces()),
-                stream(subClass.getSuperclass())
-        ));
+    }    public static boolean isLineage(final Class<?> superClass, final Class<?> subClass) {
+        return (!subClass.isInterface() || superClass.isInterface()) && superClass.isAssignableFrom(subClass);
     }
 
     /**
@@ -107,7 +98,7 @@ public class Classes {
         /**
          * For convenience: a {@link Function} to treat the direct {@link Class#getSuperclass() superclass} of a given
          * {@link Class} as a {@link Stream}.
-         *
+         * <p>
          * The result will be an empty {@link Stream} if the given {@link Class} has no {@link Class#getSuperclass()
          * superclass}. Otherwise the result is a {@link Stream} consisting of exactly one element, namely the
          * requested {@link Class#getSuperclass() superclass}.
@@ -173,7 +164,7 @@ public class Classes {
 
         @SuppressWarnings("OptionalGetWithoutIsPresent")
         private int from(final Stream<Class<?>> subClasses) {
-            return subClasses.filter(subClass -> isHierarchical(superClass, subClass))
+            return subClasses.filter(subClass -> isLineage(superClass, subClass))
                              .map(this::from)
                              .reduce(LIMIT, Math::min);
         }

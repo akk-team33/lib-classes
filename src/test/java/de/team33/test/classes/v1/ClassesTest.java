@@ -112,27 +112,27 @@ public class ClassesTest {
     }
 
     @Test
-    public void isHierarchical() {
+    public void isLineage() {
         for (Class<?> superClass : CLASSES) {
-            assertHierarchical(superClass);
+            assertLineage(superClass);
         }
     }
 
-    private void assertHierarchical(final Class<?> superClass) {
+    private void assertLineage(final Class<?> superClass) {
         for (Class<?> subClass : CLASSES) {
-            assertHierarchical(superClass, subClass);
+            assertLineage(superClass, subClass);
         }
     }
 
-    private void assertHierarchical(final Class<?> superClass, final Class<?> subClass) {
+    private void assertLineage(final Class<?> superClass, final Class<?> subClass) {
         final boolean assignable = superClass.isAssignableFrom(subClass);
-        final boolean hierarchical = Classes.isHierarchical(superClass, subClass);
+        final boolean lineage = Classes.isLineage(superClass, subClass);
         final String message = superClass + " > " + subClass;
         if (Object.class.equals(superClass) && subClass.isInterface()) {
             assertTrue(message, assignable);
-            assertFalse(message, hierarchical);
+            assertFalse(message, lineage);
         } else {
-            assertEquals(message, assignable, hierarchical);
+            assertEquals(message, assignable, lineage);
         }
     }
 
