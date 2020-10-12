@@ -1,5 +1,6 @@
 package de.team33.libs.classes.v1;
 
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -10,8 +11,23 @@ import java.util.stream.Stream;
 @SuppressWarnings("WeakerAccess")
 public class Classes {
 
+    private static final String NO_LINEAGE =
+            "there is no proper lineage relationship from <%s> as superclass to <%s> as subclass";
+
     private static <E> Stream<E> stream(final E subject) {
         return (null == subject) ? Stream.empty() : Stream.of(subject);
+    }
+
+    /**
+     * Determines whether there is an (possibly indirect but) explicit lineage relationship between two classes.
+     * <p>
+     * <em>Note: Any interface {@link Class#isAssignableFrom(Class) can be assigned to} the class Object, for example,
+     * but there is no explicit lineage relationship between {@link Object} and any interface.</em>
+     *
+     * @throws NullPointerException if one of the given Arguments is {@code null}.
+     */
+    public static boolean isLineage(final Class<?> superClass, final Class<?> subClass) {
+        return (superClass.isInterface() || !subClass.isInterface()) && superClass.isAssignableFrom(subClass);
     }
 
     /**
@@ -86,8 +102,6 @@ public class Classes {
 
     private static Stream<Class<?>> broad(final Class<?>[] subjects) {
         return Stream.of(subjects).map(Classes::broad).reduce(Stream::concat).orElseGet(Stream::empty);
-    }    public static boolean isLineage(final Class<?> superClass, final Class<?> subClass) {
-        return (!subClass.isInterface() || superClass.isInterface()) && superClass.isAssignableFrom(subClass);
     }
 
     /**
@@ -158,15 +172,23 @@ public class Classes {
             return Stream.concat(Stream.of(aClass.getInterfaces()), superClassOf(aClass));
         }
 
-        final int from(final Class<?> subClass) {
-            return superClass.equals(subClass) ? 0 : 1 + from(superClasses.apply(subClass));
+        private int from(final Class<?> subClass) {
+            try {
+                return superClass.equals(subClass) ? 0 : 1 + from(superClasses.apply(subClass));
+            } catch (final NoLineageException e) {
+                throw new IllegalArgumentException(String.format(NO_LINEAGE, superClass, subClass), e);
+            }
         }
 
         @SuppressWarnings("OptionalGetWithoutIsPresent")
         private int from(final Stream<Class<?>> subClasses) {
             return subClasses.filter(subClass -> isLineage(superClass, subClass))
                              .map(this::from)
-                             .reduce(LIMIT, Math::min);
+                             .reduce(Math::min)
+                             .orElseThrow(NoLineageException::new);
+        }
+
+        private static class NoLineageException extends RuntimeException {
         }
     }
 }

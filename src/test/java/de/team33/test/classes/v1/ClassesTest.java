@@ -25,6 +25,9 @@ import static org.junit.Assert.fail;
 public class ClassesTest {
 
     private static final List<Class<?>> CLASSES = Arrays.asList(
+            void.class,
+            int.class,
+            Void.class,
             Object.class,
             Integer.class,
             BigInteger.class,
@@ -66,19 +69,16 @@ public class ClassesTest {
         assertEquals(3, Classes.distance(ArrayList.class, Object.class));
     }
 
-    @Ignore
     @Test(expected = IllegalArgumentException.class)
     public void distanceInterfaceToObject() {
         fail("Should fail but was " + Classes.distance(List.class, Object.class));
     }
 
-    @Ignore
     @Test(expected = IllegalArgumentException.class)
     public void distanceReverse() {
         fail("Should fail but was " + Classes.distance(Super.class, Inner.class));
     }
 
-    @Ignore
     @Test(expected = IllegalArgumentException.class)
     public void distanceNonRelated() {
         fail("Should fail but was " + Classes.distance(List.class, StringBuilder.class));
