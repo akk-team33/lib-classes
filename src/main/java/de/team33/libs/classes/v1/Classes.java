@@ -1,6 +1,5 @@
 package de.team33.libs.classes.v1;
 
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -45,20 +44,19 @@ public class Classes {
      * Streams, in a single step, all the direct {@link Class#getInterfaces() interfaces} and, if any, the direct
      * {@link Class#getSuperclass() superclass} of a given {@link Class}.
      */
-    public static Stream<Class<?>> streamSuperior(final Class<?> subject) {
+    public static Stream<Class<?>> superior(final Class<?> subject) {
         return Stream.concat(Stream.of(subject.getInterfaces()), stream(subject.getSuperclass()));
     }
 
     /**
-     * Streams the linear descent of a given {@link Class}, made up of the linear descent of its
-     * {@link Class#getSuperclass() superclass}, and the {@link Class} itself.
-     * <p>
-     * The Result will be an empty {@link Stream} if {@code subject} is {@code null}.
+     * Streams the lineage classes of a given class.
+     * In particular results in a {@link Stream} that is composed of the lineage classes of the
+     * ({@link Class#getSuperclass() superclass} and finally the mentioned class itself.
      */
-    public static Stream<Class<?>> streamLinearDescent(final Class<?> subject) {
+    public static Stream<Class<?>> lineageClasses(final Class<?> subject) {
         return (null == subject)
                 ? Stream.empty()
-                : Stream.concat(streamLinearDescent(subject.getSuperclass()), Stream.of(subject));
+                : Stream.concat(lineageClasses(subject.getSuperclass()), Stream.of(subject));
     }
 
     /**
@@ -67,41 +65,17 @@ public class Classes {
      * ({@link Class#getSuperclass() superclass} and {@link Class#getInterfaces() interfaces}) and finally the
      * mentioned class itself.
      */
-    public static Stream<Class<?>> streamLineageHierarchy(final Class<?> subject) {
-        return streamLineageHierarchyIndistinct(subject).distinct();
+    public static Stream<Class<?>> lineageHierarchy(final Class<?> subject) {
+        return (null == subject)
+                ? Stream.empty()
+                : streamLineageHierarchyIndistinct(subject).distinct();
     }
 
     private static Stream<Class<?>> streamLineageHierarchyIndistinct(final Class<?> subject) {
-        return Stream.concat(streamSuperior(subject).map(Classes::streamLineageHierarchyIndistinct)
-                                                    .reduce(Stream::concat)
-                                                    .orElseGet(Stream::empty),
+        return Stream.concat(superior(subject).map(Classes::streamLineageHierarchyIndistinct)
+                                              .reduce(Stream::concat)
+                                              .orElseGet(Stream::empty),
                              Stream.of(subject));
-    }
-
-    /**
-     * Streams a {@link Class} hierarchy. This method includes the given {@link Class}, its
-     * {@linkplain Class#getSuperclass() superclasses} and its {@linkplain Class#getInterfaces() superinterfaces}.
-     *
-     * @see #streamLinearDescent(Class)
-     */
-    public static Stream<Class<?>> wideStreamOf(final Class<?> subject) {
-        return broad(subject).distinct();
-    }
-
-    private static Stream<Class<?>> broad(final Class<?> subject) {
-        return (null == subject)
-                ? Stream.empty()
-                : broad(subject.getInterfaces(), subject.getSuperclass(), subject);
-    }
-
-    private static Stream<Class<?>> broad(final Class<?>[] interfaces,
-                                          final Class<?> superclass,
-                                          final Class<?> subject) {
-        return Stream.concat(broad(interfaces), Stream.concat(broad(superclass), Stream.of(subject)));
-    }
-
-    private static Stream<Class<?>> broad(final Class<?>[] subjects) {
-        return Stream.of(subjects).map(Classes::broad).reduce(Stream::concat).orElseGet(Stream::empty);
     }
 
     /**
@@ -126,24 +100,22 @@ public class Classes {
         Streaming INTERFACES = subject -> Stream.of(subject.getInterfaces());
 
         /**
-         * Encapsulates {@link #streamSuperior(Class)} as a {@link Function}
+         * Encapsulates {@link #superior(Class)} as a {@link Function}
          */
-        Streaming SUPERIOR = Classes::streamSuperior;
+        Streaming SUPERIOR = Classes::superior;
 
         /**
-         * Encapsulates {@link #streamLinearDescent(Class)} as a {@link Function}
+         * Encapsulates {@link #lineageClasses(Class)} as a {@link Function}
          */
-        Streaming LINEAR_DESCENT = Classes::streamLinearDescent;
+        Streaming LINEAR_DESCENT = Classes::lineageClasses;
 
         /**
-         * Encapsulates {@link #streamLineageHierarchy(Class)} as a {@link Function}
+         * Encapsulates {@link #lineageHierarchy(Class)} as a {@link Function}
          */
-        Streaming LINEAGE_HIERARCHY = Classes::streamLineageHierarchy;
+        Streaming LINEAGE_HIERARCHY = Classes::lineageHierarchy;
     }
 
     private static class Distance {
-
-        private static final int LIMIT = Short.MAX_VALUE;
 
         private final Class<?> superClass;
         private final Function<Class<?>, Stream<Class<?>>> superClasses;

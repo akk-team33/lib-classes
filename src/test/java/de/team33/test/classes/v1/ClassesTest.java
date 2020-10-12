@@ -1,7 +1,6 @@
 package de.team33.test.classes.v1;
 
 import de.team33.libs.classes.v1.Classes;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -14,7 +13,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -100,15 +98,13 @@ public class ClassesTest {
     }
 
     @Test
-    public void wide() {
-        assertEquals(Arrays.asList("interface de.team33.test.classes.v1.ClassesTest$ISuper1",
-                                   "interface de.team33.test.classes.v1.ClassesTest$ISuper2",
-                                   "interface de.team33.test.classes.v1.ClassesTest$ISuper3",
-                                   "class java.lang.Object",
-                                   "class de.team33.test.classes.v1.ClassesTest$Base",
-                                   "class de.team33.test.classes.v1.ClassesTest$Super",
-                                   "class de.team33.test.classes.v1.ClassesTest$Inner"),
-                     Classes.wideStreamOf(Inner.class).map(Class::toString).collect(Collectors.toList()));
+    public void lineageClassesNull() {
+        assertEquals(0, Classes.lineageClasses(null).count());
+    }
+
+    @Test
+    public void lineageHierarchyNull() {
+        assertEquals(0, Classes.lineageHierarchy(null).count());
     }
 
     @Test
@@ -142,7 +138,7 @@ public class ClassesTest {
     }
 
     private boolean isAnalysedLineage(final Class<?> superClass, final Class<?> subClass) {
-        return superClass.equals(subClass) || Classes.streamSuperior(subClass)
+        return superClass.equals(subClass) || Classes.superior(subClass)
                                                      .anyMatch(sub -> isAnalysedLineage(superClass, sub));
     }
 
