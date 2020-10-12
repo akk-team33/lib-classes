@@ -45,7 +45,9 @@ public class Classes {
      * {@link Class#getSuperclass() superclass} of a given {@link Class}.
      */
     public static Stream<Class<?>> superior(final Class<?> subject) {
-        return Stream.concat(Stream.of(subject.getInterfaces()), stream(subject.getSuperclass()));
+        return (null == subject)
+                ? Stream.empty()
+                : Stream.concat(Stream.of(subject.getInterfaces()), stream(subject.getSuperclass()));
     }
 
     /**

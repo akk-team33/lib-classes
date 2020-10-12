@@ -98,6 +98,11 @@ public class ClassesTest {
     }
 
     @Test
+    public void superiorNull() {
+        assertEquals(0, Classes.superior(null).count());
+    }
+
+    @Test
     public void lineageClassesNull() {
         assertEquals(0, Classes.lineageClasses(null).count());
     }
