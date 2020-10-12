@@ -114,26 +114,36 @@ public class ClassesTest {
     @Test
     public void isLineage() {
         for (Class<?> superClass : CLASSES) {
-            assertLineage(superClass);
+            isLineage(superClass);
         }
     }
 
-    private void assertLineage(final Class<?> superClass) {
+    private void isLineage(final Class<?> superClass) {
         for (Class<?> subClass : CLASSES) {
-            assertLineage(superClass, subClass);
+            isLineage(superClass, subClass);
         }
     }
 
-    private void assertLineage(final Class<?> superClass, final Class<?> subClass) {
+    private void isLineage(final Class<?> superClass, final Class<?> subClass) {
         final boolean assignable = superClass.isAssignableFrom(subClass);
         final boolean lineage = Classes.isLineage(superClass, subClass);
         final String message = superClass + " > " + subClass;
+
+        // assert Classes.isLineage(...) in relation to Class.isAssignable(...) ...
         if (Object.class.equals(superClass) && subClass.isInterface()) {
             assertTrue(message, assignable);
             assertFalse(message, lineage);
         } else {
             assertEquals(message, assignable, lineage);
         }
+
+        // assert Classes.isLineage(...) by complete analysis ...
+        assertEquals(message, isAnalysedLineage(superClass, subClass), lineage);
+    }
+
+    private boolean isAnalysedLineage(final Class<?> superClass, final Class<?> subClass) {
+        return superClass.equals(subClass) || Classes.streamSuperior(subClass)
+                                                     .anyMatch(sub -> isAnalysedLineage(superClass, sub));
     }
 
     private interface ISuper1 {

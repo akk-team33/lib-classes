@@ -96,8 +96,8 @@ public class Classes {
     public interface Streaming extends Function<Class<?>, Stream<Class<?>>> {
 
         /**
-         * For convenience: a {@link Function} to treat the direct {@link Class#getSuperclass() superclass} of a given
-         * {@link Class} as a {@link Stream}.
+         * For the sake of completeness and convenience: a {@link Function} to treat the direct
+         * {@link Class#getSuperclass() superclass} of a given {@link Class} as a {@link Stream}.
          * <p>
          * The result will be an empty {@link Stream} if the given {@link Class} has no {@link Class#getSuperclass()
          * superclass}. Otherwise the result is a {@link Stream} consisting of exactly one element, namely the
@@ -106,8 +106,8 @@ public class Classes {
         Streaming SUPER_CLASS = subject -> stream(subject.getSuperclass());
 
         /**
-         * For convenience: a {@link Function} to treat the direct {@link Class#getInterfaces() interfaces} of a given
-         * {@link Class} as a {@link Stream}.
+         * For the sake of completeness and convenience: a {@link Function} to treat the direct
+         * {@link Class#getInterfaces() interfaces} of a given {@link Class} as a {@link Stream}.
          */
         Streaming INTERFACES = subject -> Stream.of(subject.getInterfaces());
 
