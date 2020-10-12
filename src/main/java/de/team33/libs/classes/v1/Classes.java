@@ -36,7 +36,7 @@ public class Classes {
      * @throws IllegalArgumentException if {@code <subject>} ist not a derivative of {@code <superClass>}.
      * @throws NullPointerException     if one of the given Arguments is {@code null}.
      */
-    public static int distance(final Class<?> subject, final Class<?> superClass) {
+    public static int distance(final Class<?> superClass, final Class<?> subject) {
         return Distance.of(superClass).from(subject);
     }
 
