@@ -30,7 +30,7 @@ public class Classes {
     }
 
     /**
-     * Specifies the distance between a class {@code <subClass>} and a superordinate class from its lineage hierarchy
+     * Determines the distance between a class {@code <subClass>} and a superordinate class from its lineage hierarchy
      * {@code <superClass>}, whereby the distance between a class and itself is always 0.
      *
      * The distance between a class and its direct {@link Class#getSuperclass() superclass} or one of its direct
@@ -113,7 +113,7 @@ public class Classes {
         /**
          * Encapsulates {@link #lineageClasses(Class)} as a {@link Function}
          */
-        Streaming LINEAR_DESCENT = Classes::lineageClasses;
+        Streaming LINEAGE_CLASSES = Classes::lineageClasses;
 
         /**
          * Encapsulates {@link #lineageHierarchy(Class)} as a {@link Function}

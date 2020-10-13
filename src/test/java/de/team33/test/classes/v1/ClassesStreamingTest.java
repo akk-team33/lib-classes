@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static de.team33.libs.classes.v1.Classes.Streaming.LINEAGE_HIERARCHY;
 import static de.team33.libs.classes.v1.Classes.Streaming.INTERFACES;
-import static de.team33.libs.classes.v1.Classes.Streaming.LINEAR_DESCENT;
+import static de.team33.libs.classes.v1.Classes.Streaming.LINEAGE_CLASSES;
 import static de.team33.libs.classes.v1.Classes.Streaming.SUPERIOR;
 import static de.team33.libs.classes.v1.Classes.Streaming.SUPER_CLASS;
 import static java.util.Arrays.asList;
@@ -82,27 +82,27 @@ public class ClassesStreamingTest {
     }
 
     @Test
-    public void linearDescent() {
-        linearDescent(Object.class, Object.class);
-        linearDescent(Integer.class, Object.class, Number.class, Integer.class);
-        linearDescent(BigInteger.class, Object.class, Number.class, BigInteger.class);
-        linearDescent(Number.class, Object.class, Number.class);
-        linearDescent(String.class, Object.class, String.class);
-        linearDescent(StringBuilder.class, Object.class, ABSTRACT_STRING_BUILDER_CLASS, StringBuilder.class);
-        linearDescent(CharSequence.class, CharSequence.class);
-        linearDescent(Collection.class, Collection.class);
-        linearDescent(List.class, List.class);
-        linearDescent(Set.class, Set.class);
-        linearDescent(AbstractList.class, Object.class, AbstractCollection.class, AbstractList.class);
-        linearDescent(ArrayList.class, Object.class, AbstractCollection.class, AbstractList.class, ArrayList.class);
-        linearDescent(HashSet.class, Object.class, AbstractCollection.class, AbstractSet.class, HashSet.class);
-        linearDescent(AbstractSet.class, Object.class, AbstractCollection.class, AbstractSet.class);
-        linearDescent(Serializable.class, Serializable.class);
-        linearDescent(Cloneable.class, Cloneable.class);
+    public void lineageClasses() {
+        lineageClasses(Object.class, Object.class);
+        lineageClasses(Integer.class, Object.class, Number.class, Integer.class);
+        lineageClasses(BigInteger.class, Object.class, Number.class, BigInteger.class);
+        lineageClasses(Number.class, Object.class, Number.class);
+        lineageClasses(String.class, Object.class, String.class);
+        lineageClasses(StringBuilder.class, Object.class, ABSTRACT_STRING_BUILDER_CLASS, StringBuilder.class);
+        lineageClasses(CharSequence.class, CharSequence.class);
+        lineageClasses(Collection.class, Collection.class);
+        lineageClasses(List.class, List.class);
+        lineageClasses(Set.class, Set.class);
+        lineageClasses(AbstractList.class, Object.class, AbstractCollection.class, AbstractList.class);
+        lineageClasses(ArrayList.class, Object.class, AbstractCollection.class, AbstractList.class, ArrayList.class);
+        lineageClasses(HashSet.class, Object.class, AbstractCollection.class, AbstractSet.class, HashSet.class);
+        lineageClasses(AbstractSet.class, Object.class, AbstractCollection.class, AbstractSet.class);
+        lineageClasses(Serializable.class, Serializable.class);
+        lineageClasses(Cloneable.class, Cloneable.class);
     }
 
-    private void linearDescent(final Class<?> subject, final Class<?> ... expected) {
-        assertEquals(asList(expected), LINEAR_DESCENT.apply(subject).collect(Collectors.toList()));
+    private void lineageClasses(final Class<?> subject, final Class<?> ... expected) {
+        assertEquals(asList(expected), LINEAGE_CLASSES.apply(subject).collect(Collectors.toList()));
     }
 
     @Test
