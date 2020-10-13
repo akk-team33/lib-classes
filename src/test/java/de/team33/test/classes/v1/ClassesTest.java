@@ -88,7 +88,7 @@ public class ClassesTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void distanceReverse() {
-        fail("Should fail but was " + Classes.distance(Collection.class, ArrayList.class));
+        fail("Should fail but was " + Classes.distance(ArrayList.class, Collection.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
