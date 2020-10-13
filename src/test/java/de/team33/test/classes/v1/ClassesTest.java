@@ -6,13 +6,18 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.AbstractList;
+import java.util.AbstractSequentialList;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -46,32 +51,13 @@ public class ClassesTest {
 
     @Test
     public void distance() {
-        for (final Class<?> anyClass : CLASSES) {
+        CLASSES.forEach(anyClass -> {
             assertEquals(0, Classes.distance(anyClass, anyClass));
-        }
-
-        assertEquals(1, Classes.distance(Object.class, Void.class));
-        assertEquals(1, Classes.distance(Object.class, Number.class));
-        assertEquals(1, Classes.distance(Object.class, String.class));
-        assertEquals(1, Classes.distance(Number.class, Integer.class));
-        assertEquals(1, Classes.distance(Number.class, BigInteger.class));
-        assertEquals(1, Classes.distance(CharSequence.class, String.class));
-        assertEquals(1, Classes.distance(CharSequence.class, StringBuilder.class));
-        assertEquals(1, Classes.distance(Collection.class, List.class));
-        assertEquals(1, Classes.distance(Collection.class, Set.class));
-        assertEquals(1, Classes.distance(List.class, AbstractList.class));
-        assertEquals(1, Classes.distance(List.class, ArrayList.class));
-        assertEquals(1, Classes.distance(Set.class, HashSet.class));
-        assertEquals(1, Classes.distance(Set.class, AbstractSet.class));
-        assertEquals(1, Classes.distance(AbstractList.class, ArrayList.class));
-        assertEquals(1, Classes.distance(AbstractSet.class, HashSet.class));
-        assertEquals(1, Classes.distance(Serializable.class, Number.class));
-        assertEquals(1, Classes.distance(Serializable.class, String.class));
-        assertEquals(1, Classes.distance(Serializable.class, StringBuilder.class));
-        assertEquals(1, Classes.distance(Serializable.class, ArrayList.class));
-        assertEquals(1, Classes.distance(Serializable.class, HashSet.class));
-        assertEquals(1, Classes.distance(Cloneable.class, ArrayList.class));
-        assertEquals(1, Classes.distance(Cloneable.class, HashSet.class));
+            Optional.ofNullable(anyClass.getSuperclass())
+                    .ifPresent(superClass -> assertEquals(1, Classes.distance(superClass, anyClass)));
+            Stream.of(anyClass.getInterfaces())
+                  .forEach(superClass -> assertEquals(1, Classes.distance(superClass, anyClass)));
+        });
 
         assertEquals(2, Classes.distance(Object.class, Integer.class));
         assertEquals(2, Classes.distance(Object.class, BigInteger.class));
@@ -84,9 +70,15 @@ public class ClassesTest {
         assertEquals(2, Classes.distance(Collection.class, AbstractSet.class));
         assertEquals(2, Classes.distance(Serializable.class, Integer.class));
         assertEquals(2, Classes.distance(Serializable.class, BigInteger.class));
+        assertEquals(2, Classes.distance(Collection.class, LinkedList.class));
 
+        assertEquals(3, Classes.distance(Object.class, ConcurrentSkipListSet.class));
+        assertEquals(3, Classes.distance(Collection.class, AbstractSequentialList.class));
+        assertEquals(3, Classes.distance(Object.class, AbstractSequentialList.class));
         assertEquals(3, Classes.distance(Object.class, ArrayList.class));
         assertEquals(3, Classes.distance(Object.class, HashSet.class));
+
+        assertEquals(4, Classes.distance(Object.class, LinkedList.class));
     }
 
     @Test(expected = IllegalArgumentException.class)

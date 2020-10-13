@@ -30,14 +30,18 @@ public class Classes {
     }
 
     /**
-     * Determines the distance of a given class {@code <subject>} from one of its superclasses or interfaces
-     * {@code <superClass>}, where the distance of a class to itself is always 0.
+     * Specifies the distance between a class {@code <subClass>} and a superordinate class from its lineage hierarchy
+     * {@code <superClass>}, whereby the distance between a class and itself is always 0.
      *
-     * @throws IllegalArgumentException if {@code <subject>} ist not a derivative of {@code <superClass>}.
+     * The distance between a class and its direct {@link Class#getSuperclass() superclass} or one of its direct
+     * {@link Class#getInterfaces() interfaces} is always 1 and so on.
+     *
+     * @throws IllegalArgumentException if {@code <superClass>} ist not a superordinate class from the lineage
+     *                                  hierarchy of {@code <subClass>} or at least the {@code <subClass>} itself.
      * @throws NullPointerException     if one of the given Arguments is {@code null}.
      */
-    public static int distance(final Class<?> superClass, final Class<?> subject) {
-        return Distance.of(superClass).from(subject);
+    public static int distance(final Class<?> superClass, final Class<?> subClass) {
+        return Distance.of(superClass).from(subClass);
     }
 
     /**
