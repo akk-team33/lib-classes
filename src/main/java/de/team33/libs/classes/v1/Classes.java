@@ -13,10 +13,6 @@ public class Classes {
     private static final String NO_LINEAGE =
             "there is no proper lineage relationship from <%s> as superclass to <%s> as subclass";
 
-    private static <E> Stream<E> stream(final E subject) {
-        return (null == subject) ? Stream.empty() : Stream.of(subject);
-    }
-
     /**
      * Determines whether there is an (possibly indirect but) explicit lineage relationship between two classes.
      * <p>
@@ -49,9 +45,7 @@ public class Classes {
      * {@link Class#getSuperclass() superclass} of a given {@link Class}.
      */
     public static Stream<Class<?>> superior(final Class<?> subject) {
-        return (null == subject)
-                ? Stream.empty()
-                : Stream.concat(Stream.of(subject.getInterfaces()), stream(subject.getSuperclass()));
+        return Basics.superior(subject);
     }
 
     /**
@@ -97,7 +91,7 @@ public class Classes {
          * superclass}. Otherwise the result is a {@link Stream} consisting of exactly one element, namely the
          * requested {@link Class#getSuperclass() superclass}.
          */
-        Streaming SUPER_CLASS = subject -> stream(subject.getSuperclass());
+        Streaming SUPER_CLASS = subject -> Basics.stream(subject.getSuperclass());
 
         /**
          * For the sake of completeness and convenience: a {@link Function} to treat the direct
@@ -121,7 +115,7 @@ public class Classes {
         Streaming LINEAGE_HIERARCHY = Classes::lineageHierarchy;
     }
 
-    private static class Distance {
+    private static final class Distance {
 
         private final Class<?> superClass;
         private final Function<Class<?>, Stream<Class<?>>> superClasses;
