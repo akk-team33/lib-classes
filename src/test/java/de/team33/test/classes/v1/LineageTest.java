@@ -38,7 +38,7 @@ public class LineageTest {
             Serializable.class,
             Cloneable.class);
 
-    @Test
+    @Test(timeout = 10000)
     public final void contains() {
         for (final Class<?> entry : CLASSES) {
             final Lineage lineage = Lineage.of(entry);

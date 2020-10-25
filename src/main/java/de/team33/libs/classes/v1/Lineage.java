@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.Collections.unmodifiableList;
@@ -17,18 +18,21 @@ import static java.util.Collections.unmodifiableList;
  */
 public final class Lineage {
 
-    private static final Map<Class<?>, Lineage> CACHE = new ConcurrentHashMap<>(0);
+    private static final Map<Class<?>, Lazy<Lineage>> CACHE = new ConcurrentHashMap<>(0);
+    private static final Function<Class<?>, Lazy<Lineage>> NEW_LAZY_LINEAGE = key ->
+            new Lazy<>(() -> new Lineage(key));
 
     private final Class<?> subject;
-    private final Lazy<List<Lineage>> superior = new Lazy<>(this::newSuperior);
+    private final List<Lineage> superior;
     private final transient Lazy<List<Object>> listView = new Lazy<>(this::newListView);
 
     private Lineage(final Class<?> subject) {
         this.subject = subject;
+        this.superior = newSuperior();
     }
 
     public static Lineage of(final Class<?> subject) {
-        return CACHE.computeIfAbsent(subject, Lineage::new);
+        return CACHE.computeIfAbsent(subject, NEW_LAZY_LINEAGE).get();
     }
 
     private List<Lineage> newSuperior() {
@@ -46,8 +50,7 @@ public final class Lineage {
     }
 
     public final Stream<Class<?>> stream() {
-        return Stream.concat(superior.get()
-                                     .stream()
+        return Stream.concat(superior.stream()
                                      .flatMap(Lineage::stream),
                              Stream.of(subject));
     }
