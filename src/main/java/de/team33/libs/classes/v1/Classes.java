@@ -45,7 +45,7 @@ public class Classes {
      * {@link Class#getSuperclass() superclass} of a given {@link Class}.
      */
     public static Stream<Class<?>> superior(final Class<?> subject) {
-        return Basics.superior(subject);
+        return Basics.streamOfSuperior(subject);
     }
 
     /**
@@ -91,7 +91,7 @@ public class Classes {
          * superclass}. Otherwise the result is a {@link Stream} consisting of exactly one element, namely the
          * requested {@link Class#getSuperclass() superclass}.
          */
-        Streaming SUPER_CLASS = subject -> Basics.stream(subject.getSuperclass());
+        Streaming SUPER_CLASS = subject -> Basics.streamOfNullable(subject.getSuperclass());
 
         /**
          * For the sake of completeness and convenience: a {@link Function} to treat the direct

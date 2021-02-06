@@ -36,7 +36,7 @@ public final class Lineage {
     }
 
     private List<Lineage> newSuperior() {
-        return unmodifiableList(new ArrayList<>(Basics.superior(subject)
+        return unmodifiableList(new ArrayList<>(Basics.streamOfSuperior(subject)
                                                       .map(Lineage::of)
                                                       .collect(LinkedList::new, List::add, List::addAll)));
     }
